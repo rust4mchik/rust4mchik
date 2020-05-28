@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta charset="utf-8" />
+  <meta name="robots" content="none" />
+  <meta name="keywords" content="Сайт портфолио, фрилансер, фриланс, портфолио, веб-разработчик, front-end developer, заказать сайт, верстка" />
+  <meta name="description" content="Сайт-портфолио с готовыми примерами работ фрилансера Рустама Салахетдинова" />
+  <meta name="author" content="rust4mchik | t.me/rust4mchik" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <meta property="og:title" content="Сайт-портфолио - rust4mchik" />
+  <meta property="og:type" content="website" />
+  <meta property="og:description" content="Сайт-портфолио с готовыми примерами работ фрилансера Рустама Салахетдинова" />
+  <meta property="og:image" content="https://sun9-54.userapi.com/c855236/v855236090/23be96/vCWv5SvYx10.jpg" />
+  <meta property="og:url" content="https://rust4mchik.github.io/rust4mchik" />
+  <title> Сайт-портфолио - rust4mchik </title>
+  <link href="css/main.css" rel="stylesheet" type="text/css" />
+  <link href="images/favicon.ico" rel="icon" type="image/x-icon" />
+</head>
+
+<body>
+
+  <div id="app">
+    <header class="header" :class="{ scroll : menuScroll, active : menuActive }">
+      <div class="container">
+        <template v-if="reziseMenu">
+          <div class="header-burger" :class="{ active : menuActive }" @click.prevent="mobileMenu">
+            <div class="lines"></div>
+          </div>
+        </template>
+        <template v-else>
+          <div class="header-menu">
+            <menu-link v-for="link in menuLinks" :link="link" :key="link.id" @moving="movingAnchor(event)"></menu-link>
+            <div class="menu-link">
+              <a href="#" @click.prevent="showUpPopupFeedback">Связаться</a>
+            </div>
+          </div>
+        </template>
+      </div>
+    </header>
+    <section class="home" id="home">
+      <div class="container">
+        <div class="home-content">
+          <h1>
+            <span>&lt;div&gt;</span>
+            <div>
+              <span>&lt;h1&gt;</span>
+              <div>
+                <span class="text">Рустам Салахетдинов</span>
+              </div>
+              <span>&lt;/h1&gt;</span>
+              <span>&lt;span&gt;</span>
+              <div>
+                <span class="text">начинающий front-end developer!</span>
+              </div>
+              <span>&lt;/span&gt;</span>
+            </div>
+            <span>&lt;/div&gt;</span>
+          </h1> 
+          <a class="home-content__btn" href="#skills" @click="movingAnchor(event)"></a>
+        </div>
+      </div>
+    </section>
+    <section class="skills" id="skills">
+      <div class="container">
+        <h2>Навыки и знания</h2>
+        <div class="row">
+          <skill-item v-for="skill in skillList" :skill="skill" :key="skill.id"></skill-item>
+        </div>
+      </div>
+    </section>
+    <section class="portfolio" id="portfolio">
+      <div class="container">
+        <h2>Портфолио</h2>
+        <div class="portfolio-btns">
+          <portfolio-btn v-for="btn in portfolioBtns" :btn="btn" :key="btn.id" @rendor="currentRendor = btn" :class="['portfolio-btns__btn', { active: currentRendor === btn }]"></portfolio-btn>
+        </div>
+      </div>
+      <div class="portfolio-list">
+        <portfolio-item v-for="(portfolio, index) in portfolioList" :portfolio="portfolio" :key="portfolio.id" v-if="portfolio.category === currentRendor || currentRendor === 'all'" @showup="showUpPopupPortfolio(index)"></portfolio-item>
+      </div>
+    </section>
+    <section class="mobile-nav" :class="{ opened : menuActive }" v-if="reziseMenu">
+      <div class="mobile-nav__mask" @click.prevent="mobileMenu"></div>
+      <div class="mobile-nav__container">
+        <menu-link v-for="link in menuLinks" :link="link" :key="link.id" @moving="movingAnchor(event)"></menu-link>
+        <div class="menu-link">
+          <a href="#" @click.prevent="showUpPopupFeedback">Связаться</a>
+        </div>
+      </div>
+    </section>
+    <div class="popup" v-if="showPopup" :class="{ active : showPopup }">
+      <div class="popup-mask" @click.prevent="fadeOutPopup"></div>
+      <div class="popup-container">
+        <div class="popup-container__content modal-portfolio" v-if="showPopupPortfolio">
+          <div class="popup-title">
+            {{ popups[activePopup].title }}
+          </div>
+          <div class="popup-description">
+            {{ popups[activePopup].description }}
+          </div>
+          <div class="row">
+            <div class="popup-tools">
+              <div class="popup-tools__title">
+                Инструменты
+              </div>
+              <popup-tools v-for="tool in popups[activePopup].tools" :tool="tool" :key="tool.id"></popup-tools>
+            </div>
+            <div class="popup-info">
+              <div class="popup-info__item">
+                <span>Срок:</span>
+                {{ popups[activePopup].date }}
+              </div>
+              <div class="popup-info__item">
+                <span>Бюджет:</span>
+                {{ popups[activePopup].budget }}
+              </div>
+              <div class="popup-info__item">
+                <span>URL:</span>
+                <a :href="popups[activePopup].url.link" target="_blank">{{ popups[activePopup].url.text }}</a>
+              </div>
+              <div class="popup-info__item">
+                <button @click.prevent="showUpPopupFeedback">Связаться</button>
+              </div>
+            </div>
+          </div>
+          <div class="popup-preview">
+            Превью сайта
+            <img :src="popups[activePopup].preview.url" :alt="popups[activePopup].preview.alt" />
+          </div>
+          <div class="popup-close" @click.prevent="fadeOutPopup"></div>
+        </div>
+        <div class="popup-container__content modal-feedback" v-if="showPopupFeedback">
+          <h3>Нужен проект?</h3>
+          <p>Пожалуйста, заполните все поля.</p>
+          <p>В поле комментарий оставьте свои пожелания или техническое задание (разрешается вставить ссылку на сторонний ресурс с документом).</p>
+          <p>Мы ознакомимся в ближайшие сроки и свяжемся с Вами.</p>
+          <form method="POST">
+            <div class="row">
+              <div class="form-item">
+                <input type="text" placeholder="Имя" autocomplete="off" required />
+              </div>
+              <div class="form-item">
+                <input type="text" placeholder="Телеграм" autocomplete="off" required />
+              </div>
+            </div>
+            <input type="text" placeholder="Тема заказа" autocomplete="off" required />
+            <textarea placeholder="Комментарий..." maxlength="2000" minlength="60" autocomplete="off" required></textarea>
+            <button type="submit">Отправить</button>
+          </form>
+          <div class="popup-close" @click.prevent="fadeOutPopup"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/vue.min.js"></script>
+  <script src="js/main.js"></script>
+
+</body>
+
+</html>
